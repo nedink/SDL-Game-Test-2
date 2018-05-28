@@ -85,7 +85,6 @@ void Player::doWeakForces()
     
     // jump
     if (game->grounded(body)) {
-        //        printf("jumped: %i\n", jumped);
         if (game->keysDown[W]) {
             if (!jumped) {
                 applyForce({0, -JUMP_VEL});
@@ -93,6 +92,8 @@ void Player::doWeakForces()
             }
         }
     }
+    if (!game->keysDown[W])
+        jumped = false;
 }
 
 void Player::applyForce(xy xy) {

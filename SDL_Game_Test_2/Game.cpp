@@ -78,10 +78,13 @@ void Game::step()
             ++dist;
         }
         dist = min(player->getVel().y, dist);
-        if (dist != player->getVel().y) {
+        if (dist < player->getVel().y) {
+            // bounce (funny but dumb)
+//            player->setVel({player->getVel().x, -(player->getVel().y/2)});
             player->setVel({player->getVel().x, 0});
-            if (!keysDown[W])
-                player->jumped = false;
+            // may now undo jump lock as player is approaching ground
+//            if (!keysDown[W])
+//                player->jumped = false;
         }
         player->displace({0, dist});
     }
@@ -241,26 +244,11 @@ void Game::render()
             filledPolygonRGBA(renderer, vx, vy, 5, 0x00, 0xff, 0x00, 0x80);
     }
     
-    // draw mouse indicator
-    {
-        lineRGBA(renderer,
-                 mouseIndicator.head.x - camera->body.l(), mouseIndicator.head.y - camera->body.t(),
-                 mouseIndicator.end.x, mouseIndicator.end.y,
-                 0x00, 0xff, 0x00, 0xff);
-        
-        rectangleRGBA(renderer,
-                      (int)mouseIndicator.end.x / TILESIZE * TILESIZE,
-                      (int)mouseIndicator.end.y / TILESIZE * TILESIZE,
-                      (int)mouseIndicator.end.x / TILESIZE * TILESIZE + TILESIZE,
-                      (int)mouseIndicator.end.y / TILESIZE * TILESIZE + TILESIZE,
-                      0xff, 0x00, 0xff, 0xff);
-        
-    }
-    
     
     // do dev mode
     if (DEV_MODE)
     {
+        // draw player overlapping map tiles
         xy tlxy = mapTileXY(player->getBody().tl() - camera->body.tl());
         xy trxy = mapTileXY(player->getBody().tr() - camera->body.tr());
         xy blxy = mapTileXY(player->getBody().bl() - camera->body.bl());
@@ -298,6 +286,22 @@ void Game::render()
         SDL_RenderDrawRect(renderer, &brRect);
         
         SDL_RenderDrawLine(renderer, 0, 0, mouse.x, mouse.y);
+        
+        // draw mouse indicator
+        {
+            lineRGBA(renderer,
+                     mouseIndicator.head.x - camera->body.l(), mouseIndicator.head.y - camera->body.t(),
+                     mouseIndicator.end.x, mouseIndicator.end.y,
+                     0x00, 0xff, 0x00, 0xff);
+            
+            rectangleRGBA(renderer,
+                          (int)mouseIndicator.end.x / TILESIZE * TILESIZE,
+                          (int)mouseIndicator.end.y / TILESIZE * TILESIZE,
+                          (int)mouseIndicator.end.x / TILESIZE * TILESIZE + TILESIZE,
+                          (int)mouseIndicator.end.y / TILESIZE * TILESIZE + TILESIZE,
+                          0xff, 0x00, 0xff, 0xff);
+            
+        }
     }
     
     SDL_RenderPresent(renderer);
