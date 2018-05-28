@@ -23,6 +23,7 @@ public:
     ~Player();
     
     bool injured = false;
+    bool jumped = false;
     
     void setWidth(float w);
     void setHeight(float h);

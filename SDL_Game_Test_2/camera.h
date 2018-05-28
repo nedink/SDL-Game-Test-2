@@ -12,6 +12,7 @@ public:
     ~Camera();
     
     aabb body;
+    xy target;
     
     void update();
 };

@@ -168,5 +168,12 @@ namespace util {
         xy head;
         xy end;
     };
+    
+    struct color {
+    	unsigned short r;
+        unsigned short g;
+        unsigned short b;
+        unsigned short a;
+    };
 }
 

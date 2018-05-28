@@ -12,4 +12,6 @@ Camera::~Camera()
 {}
 
 void Camera::update()
-{}
+{
+    body += (target - body.center()) / 10.0f;
+}

@@ -59,8 +59,6 @@ void Game::init(const char* title, int xpos, int ypos, int width, int height, bo
 
 void Game::step()
 {
-//    prevFrame = new Game(*this);
-    
     ++ticks;
 //    printf("ticks: %li\n", ticks);
     
@@ -80,8 +78,11 @@ void Game::step()
             ++dist;
         }
         dist = min(player->getVel().y, dist);
-        if (dist != player->getVel().y)
+        if (dist != player->getVel().y) {
             player->setVel({player->getVel().x, 0});
+            if (!keysDown[W])
+                player->jumped = false;
+        }
         player->displace({0, dist});
     }
     // movement up
@@ -97,25 +98,6 @@ void Game::step()
         if (-dist != player->getVel().y)
             player->setVel({player->getVel().x, 0});
         player->displace({0, -dist});
-    }
-    
-    // jump
-    if (grounded(player->getBody())) {
-//        printf("jumped: %i\n", jumped);
-        if (keysDown[W]) {
-            if (!jumped) {
-                player->applyForce({0, -10});
-                jumped = true;
-            }
-        } else {
-            jumped = false;
-        }
-    }
-    
-    if (grounded(player->getBody())) {
-        if (keysDown[W]) {
-            player->setVel({player->getVel().x, -10});
-        }
     }
     
     // movement right
@@ -154,20 +136,12 @@ void Game::step()
         player->getVel().y < 0 ? max(player->getVel().y, (float)-MAX_VEL_Y) : min(player->getVel().y, (float)MAX_VEL_Y)});
     
     // center camera on player
-    camera->body += xy{
-        (player->getBody().center().x - (WINDOW_SIZE_TILES_WIDTH * TILESIZE) / 2) - camera->body.l(),
-        (player->getBody().center().y - (WINDOW_SIZE_TILES_HEIGHT * TILESIZE) / 2) - camera->body.t()
-    } / (float)10;
+    camera->target = player->getBody().center();
+    camera->update();
     
-    
+    // mouse indicator
     mouseIndicator.head = player->getBody().center();
     mouseIndicator.end = mouse;
-    
-    
-//    camera->body = player->getBody();
-    
-//    printf("camera - x: %f, y: %f\n", camera->body.l(), camera->body.t());
-//    printf("player - camera: %f, %f\n", (camera->body.tl() - player->getBody().tl()).x, (camera->body.tl() - player->getBody().tl()).y);
 }
 
 void Game::render()
@@ -177,64 +151,66 @@ void Game::render()
     
     SDL_SetRenderDrawColor(renderer, 0xff, 0xff, 0xff, 0xff);
     
-    int col = 0;
-    int row = 0;
-    int map = 0;
-    for (vector<vector<int>> i : maps) // draw map tiles
+    // draw map
     {
-        for (vector<int> j : i) {
-            for (int k : j) {
-                
-//                if ( camera->body.overlaps(aabb{xy{(float)(row * TILESIZE), (float)(col * TILESIZE)}, TILESIZE, TILESIZE}) )
-                switch (k) {
-                    
-                    case 0:
-                        break;
+        int col = 0;
+        int row = 0;
+        int map = 0;
+        for (vector<vector<int>> i : maps) // draw map tiles
+        {
+            for (vector<int> j : i) {
+                for (int k : j) {
+                    switch (k) {
+                            
+                        case 0:
+                            break;
+                            
+                        case 1: {
+                            SDL_SetRenderDrawColor(renderer, 0xff, 0xff, 0xff, 0xff);
+                            SDL_Rect rect = {
+                                col * TILESIZE - (int)camera->body.l(),
+                                row * TILESIZE - (int)camera->body.t(),
+                                TILESIZE,
+                                TILESIZE
+                            };
+                            SDL_RenderFillRect(renderer, &rect);
+                        } break;
+                            
+                        case 2: {
+                            Sint16 vx[] = {
+                                (Sint16) (col * TILESIZE + TILESIZE / 2),
+                                (Sint16) (col * TILESIZE + TILESIZE),
+                                (Sint16) (col * TILESIZE),
+                                (Sint16) (col * TILESIZE + TILESIZE / 2),
+                            };
+                            for (Sint16& i : vx)
+                                i -= (int)camera->body.l();
+                            Sint16 vy[] = {
+                                (Sint16) (row * TILESIZE),
+                                (Sint16) (row * TILESIZE + TILESIZE),
+                                (Sint16) (row * TILESIZE + TILESIZE),
+                                (Sint16) (row * TILESIZE)
+                            };
+                            for (Sint16& i : vy)
+                                i -= (int)camera->body.t();
+                            filledPolygonRGBA(renderer, vx, vy, 4, 0xff, 0x00, 0x00, 0xff);
+                            
+                        } break;
+                            
+                        default:
+                            break;
+                    }
+                    if (k == 1) {
                         
-                    case 1: {
-                        SDL_SetRenderDrawColor(renderer, 0xff, 0xff, 0xff, 0xff);
-                        SDL_Rect rect = {
-                            col * TILESIZE - (int)camera->body.l(),
-                            row * TILESIZE - (int)camera->body.t(),
-                            TILESIZE,
-                            TILESIZE
-                        };
-                        SDL_RenderFillRect(renderer, &rect);
-                    } break;
-                    
-                    case 2: {
-                        Sint16 vx[] = {
-                            (Sint16) (col * TILESIZE + TILESIZE / 2),
-                            (Sint16) (col * TILESIZE + TILESIZE),
-                            (Sint16) (col * TILESIZE),
-                            (Sint16) (col * TILESIZE + TILESIZE / 2),
-                        };
-                        for (Sint16& i : vx)
-                            i -= (int)camera->body.l();
-                        Sint16 vy[] = {
-                            (Sint16) (row * TILESIZE),
-                            (Sint16) (row * TILESIZE + TILESIZE),
-                            (Sint16) (row * TILESIZE + TILESIZE),
-                            (Sint16) (row * TILESIZE)
-                        };
-                        for (Sint16& i : vy)
-                            i -= (int)camera->body.t();
-                        filledPolygonRGBA(renderer, vx, vy, 4, 0xff, 0x00, 0x00, 0xff);
-                    } break;
-                    
-                    default:
-                        break;
+                    }
+                    col++;
                 }
-                if (k == 1) {
-                    
-                }
-                col++;
+                col = 0;
+                row++;
             }
-            col = 0;
-            row++;
+            row = 0;
+            map++;
         }
-        row = 0;
-        map++;
     }
     
     // draw player
@@ -246,8 +222,6 @@ void Game::render()
             (Sint16)(player->getBody().l()),
             (Sint16)(player->getBody().l())
         };
-        for (Sint16& i : vx)
-            i -= (int)camera->body.l();
         Sint16 vy[] = {
             (Sint16)(player->getBody().t()),
             (Sint16)(player->getBody().t()),
@@ -255,10 +229,20 @@ void Game::render()
             (Sint16)(player->getBody().b()),
             (Sint16)(player->getBody().t())
         };
+        
+        for (Sint16& i : vx)
+            i -= (int)camera->body.l();
         for (Sint16& i : vy)
             i -= (int)camera->body.t();
-        filledPolygonRGBA(renderer, vx, vy, 5, 0x00, 0xff, 0x00, 0xff);
         
+        if (grounded(player->getBody()))
+        	filledPolygonRGBA(renderer, vx, vy, 5, 0x00, 0xff, 0x00, 0xc0);
+        else
+            filledPolygonRGBA(renderer, vx, vy, 5, 0x00, 0xff, 0x00, 0x80);
+    }
+    
+    // draw mouse indicator
+    {
         lineRGBA(renderer,
                  mouseIndicator.head.x - camera->body.l(), mouseIndicator.head.y - camera->body.t(),
                  mouseIndicator.end.x, mouseIndicator.end.y,
@@ -270,16 +254,17 @@ void Game::render()
                       (int)mouseIndicator.end.x / TILESIZE * TILESIZE + TILESIZE,
                       (int)mouseIndicator.end.y / TILESIZE * TILESIZE + TILESIZE,
                       0xff, 0x00, 0xff, 0xff);
+        
     }
     
     
     // do dev mode
     if (DEV_MODE)
     {
-        xy tlxy = mapTileXY(player->getBody().tl());
-        xy trxy = mapTileXY(player->getBody().tr());
-        xy blxy = mapTileXY(player->getBody().bl());
-        xy brxy = mapTileXY(player->getBody().br());
+        xy tlxy = mapTileXY(player->getBody().tl() - camera->body.tl());
+        xy trxy = mapTileXY(player->getBody().tr() - camera->body.tr());
+        xy blxy = mapTileXY(player->getBody().bl() - camera->body.bl());
+        xy brxy = mapTileXY(player->getBody().br() - camera->body.br());
         SDL_Rect tlRect = SDL_Rect{
             (int)tlxy.x * TILESIZE,
             (int)tlxy.y * TILESIZE,
