@@ -163,5 +163,10 @@ namespace util {
             xy = arg - center();
         }
     };
+    
+    struct line {
+        xy head;
+        xy end;
+    };
 }
 

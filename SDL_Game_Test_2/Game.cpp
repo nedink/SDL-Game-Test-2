@@ -14,7 +14,6 @@ Game::Game()
 
 Game::Game(const Game &game)
 {
-    frame = game.frame;
     this->player = new Player(*player);
     this->camera = new Camera(*camera);
 }
@@ -62,6 +61,8 @@ void Game::step()
 {
 //    prevFrame = new Game(*this);
     
+    ++ticks;
+//    printf("ticks: %li\n", ticks);
     
     // apply weak forces (input, dynamic) to player
     player->doWeakForces();
@@ -69,6 +70,7 @@ void Game::step()
     // apply strong forces (corrective) to player
     player->applyForce(xy{0, keysDown[W] ? (float)FALL_VEL_SLOW : (float)FALL_VEL_FAST});
     
+    // movement down
     if (player->getVel().y > 0) {
         float dist = 0;
         while (mapTileXY(player->getBody().bl()).y < maps[map].size()
@@ -82,6 +84,7 @@ void Game::step()
             player->setVel({player->getVel().x, 0});
         player->displace({0, dist});
     }
+    // movement up
     else if (player->getVel().y < 0) {
         float dist = 0;
         while (mapTileXY(player->getBody().tl()).y > 0
@@ -96,8 +99,8 @@ void Game::step()
         player->displace({0, -dist});
     }
     
-    if (mapTile(player->getBody().bl()) == 1
-        || mapTile(player->getBody().br()) == 1) {
+    // jump
+    if (grounded(player->getBody())) {
 //        printf("jumped: %i\n", jumped);
         if (keysDown[W]) {
             if (!jumped) {
@@ -115,8 +118,7 @@ void Game::step()
         }
     }
     
-    
-    
+    // movement right
     if (player->getVel().x > 0) {
         float dist = 0;
         while (mapTileXY(player->getBody().tr()).x < maps[map][0].size()
@@ -146,28 +148,20 @@ void Game::step()
         player->displace({-dist, 0});
     }
     
-    
-    
     // max velocity
     player->setVel({player->getVel().x < 0 ?
         max(player->getVel().x, (float)-MAX_VEL_X) : min(player->getVel().x, (float)MAX_VEL_X),
         player->getVel().y < 0 ? max(player->getVel().y, (float)-MAX_VEL_Y) : min(player->getVel().y, (float)MAX_VEL_Y)});
-    
-    
-    
-//    printf("bottom-right x %f\n", player->getBody().br().x);
-//    printf("bottom-left x %f\n", player->getBody().bl().x);
-//    printf("bottom %f\n", player->getBody().b());
-//    printf("top-right %f\n", player->getBody().tr().y);
-//    printf("player->tl(): %f, %f\n", player->getBody().l(), player->getBody().t());
-//    printf("x-vel: %f\ny-vel: %f\n", player->getVel().x, player->getVel().y);
-//    printf("\n");
     
     // center camera on player
     camera->body += xy{
         (player->getBody().center().x - (WINDOW_SIZE_TILES_WIDTH * TILESIZE) / 2) - camera->body.l(),
         (player->getBody().center().y - (WINDOW_SIZE_TILES_HEIGHT * TILESIZE) / 2) - camera->body.t()
     } / (float)10;
+    
+    
+    mouseIndicator.head = player->getBody().center();
+    mouseIndicator.end = mouse;
     
     
 //    camera->body = player->getBody();
@@ -265,6 +259,17 @@ void Game::render()
             i -= (int)camera->body.t();
         filledPolygonRGBA(renderer, vx, vy, 5, 0x00, 0xff, 0x00, 0xff);
         
+        lineRGBA(renderer,
+                 mouseIndicator.head.x - camera->body.l(), mouseIndicator.head.y - camera->body.t(),
+                 mouseIndicator.end.x, mouseIndicator.end.y,
+                 0x00, 0xff, 0x00, 0xff);
+        
+        rectangleRGBA(renderer,
+                      (int)mouseIndicator.end.x / TILESIZE * TILESIZE,
+                      (int)mouseIndicator.end.y / TILESIZE * TILESIZE,
+                      (int)mouseIndicator.end.x / TILESIZE * TILESIZE + TILESIZE,
+                      (int)mouseIndicator.end.y / TILESIZE * TILESIZE + TILESIZE,
+                      0xff, 0x00, 0xff, 0xff);
     }
     
     
@@ -307,12 +312,13 @@ void Game::render()
         SDL_RenderDrawRect(renderer, &blRect);
         SDL_RenderDrawRect(renderer, &brRect);
         
-        SDL_RenderDrawLine(renderer, 0, 0, mousePos.x, mousePos.y);
+        SDL_RenderDrawLine(renderer, 0, 0, mouse.x, mouse.y);
     }
-    
     
     SDL_RenderPresent(renderer);
 }
+
+
 
 void Game::handleEvents()
 {
@@ -329,13 +335,13 @@ void Game::handleEvents()
             case SDL_MOUSEBUTTONDOWN:
             {
                 mouseDown = true;
-                mousePos = {(float)event.button.x, (float)event.button.y};
+                mouse = {(float)event.button.x, (float)event.button.y};
                 break;
             }
                 
             case SDL_MOUSEMOTION:
             {
-                mousePos = {(float)event.motion.x, (float)event.motion.y};
+                mouse = {(float)event.motion.x, (float)event.motion.y};
                 break;
             }
                 
@@ -432,6 +438,10 @@ int Game::mapTile(xy xy)
 
 bool Game::grounded(aabb aabb) {
     return mapTile({aabb.l(), aabb.b() + 1}) == 1 || mapTile({aabb.r(), aabb.b() + 1}) == 1;
+}
+
+int Game::groundedTile(xy xy) {
+    return mapTile(xy);
 }
             
 void Game::clean()

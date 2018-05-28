@@ -38,6 +38,7 @@ public:
     int mapTile(xy xy);
     
     bool grounded(aabb aabb);
+    int groundedTile(xy xy);
     
     static void AddTile(int id, int x, int y);
     static SDL_Renderer* renderer;
@@ -48,12 +49,13 @@ public:
     Game* prevFrame = nullptr;
     bool mouseDown = false;
     bool jumped = false;
-    xy mousePos;
+    xy mouse;
+    line mouseIndicator;
     Player* player;
     Camera* camera;
-    int frame = 0;
+    u_long ticks = 0;
     
-    float timeStep = 1.0f / 60.0f;
+//    float timeStep = 1.0f / 60.0f;
     int velocityIterations = 6;
     int positionIterations = 2;
     

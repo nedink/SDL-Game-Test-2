@@ -39,8 +39,6 @@ int main(int argc, const char * argv[]) {
         
         frameTime = SDL_GetTicks() - frameStart;
         
-        printf("frameTime: %i\n", frameTime);
-        
         (frameDelay > frameTime) ? SDL_Delay(frameDelay - frameTime) : SDL_Delay(0);
     }
     
