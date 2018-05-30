@@ -261,6 +261,8 @@ void Game::render()
     // do dev mode
     if (DEV_MODE)
     {
+        printf("FPS: %i\n", FPS);
+        
         // test gfx performance
         {
             for (int i = 0; i < 300; ++i) {
@@ -346,6 +348,9 @@ void Game::render()
             
         }
     }
+    else {
+        FPS = DEFAULT_FPS;
+    }
     
     SDL_RenderPresent(renderer);
 }
@@ -406,9 +411,13 @@ void Game::handleEvents()
                         break;
                     case SDLK_q:
                         keysDown[Q] = true;
+                        if (DEV_MODE)
+                            FPS = max(FPS - 1, 1);
                         break;
                     case SDLK_e:
                         keysDown[E] = true;
+                        if (DEV_MODE)
+                            FPS = min(FPS + 10, 120);
                         break;
                         
                     case SDLK_BACKQUOTE:

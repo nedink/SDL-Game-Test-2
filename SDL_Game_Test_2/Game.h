@@ -48,6 +48,8 @@ public:
     
     std::vector<bool> keysDown = {false, false, false, false, false, false};
     
+    int FPS = DEFAULT_FPS;
+    
     Game* prevFrame = nullptr;
     bool mouseDown = false;
     bool jumped = false;

@@ -3,6 +3,8 @@
 
 //bool DEV_MODE = false;
 
+#define DEFAULT_FPS 120
+
 #define RENDER_SCALE 1
 
 #define TILESIZE 0x20
