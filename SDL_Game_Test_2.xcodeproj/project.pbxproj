@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		6329D32520BCB41A0058E3C2 /* quadTree.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6329D32420BCB41A0058E3C2 /* quadTree.cpp */; };
 		6363B03820A8B5E900419C2C /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6363B03720A8B5E900419C2C /* main.cpp */; };
 		6363B04020A8B6A100419C2C /* SDL2.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6363B03F20A8B6A100419C2C /* SDL2.framework */; };
 		6363B04220A8B6D400419C2C /* SDL_image.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6363B04120A8B6D400419C2C /* SDL_image.framework */; };
@@ -29,6 +30,8 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		6329D32320BCB4060058E3C2 /* quadTree.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = quadTree.h; sourceTree = "<group>"; };
+		6329D32420BCB41A0058E3C2 /* quadTree.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = quadTree.cpp; sourceTree = "<group>"; };
 		633F3D0B20B7923E00BB72CE /* values.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = values.h; sourceTree = "<group>"; };
 		6363B03420A8B5E900419C2C /* SDL_Game_Test_2 */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = SDL_Game_Test_2; sourceTree = BUILT_PRODUCTS_DIR; };
 		6363B03720A8B5E900419C2C /* main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
@@ -79,6 +82,7 @@
 		6363B03620A8B5E900419C2C /* SDL_Game_Test_2 */ = {
 			isa = PBXGroup;
 			children = (
+				633F3D0B20B7923E00BB72CE /* values.h */,
 				6363B03720A8B5E900419C2C /* main.cpp */,
 				6363B04520AE1A3D00419C2C /* Game.h */,
 				6363B04620AE1A6800419C2C /* Game.cpp */,
@@ -88,7 +92,8 @@
 				6363B05220AFC52000419C2C /* camera.cpp */,
 				6363B05820AFCCCF00419C2C /* util.h */,
 				6363B04E20AE677F00419C2C /* maps.h */,
-				633F3D0B20B7923E00BB72CE /* values.h */,
+				6329D32320BCB4060058E3C2 /* quadTree.h */,
+				6329D32420BCB41A0058E3C2 /* quadTree.cpp */,
 			);
 			path = SDL_Game_Test_2;
 			sourceTree = "<group>";
@@ -161,6 +166,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				6363B05120AFC48100419C2C /* player.cpp in Sources */,
+				6329D32520BCB41A0058E3C2 /* quadTree.cpp in Sources */,
 				6363B03820A8B5E900419C2C /* main.cpp in Sources */,
 				6363B04720AE1A6800419C2C /* Game.cpp in Sources */,
 				6363B05320AFC52000419C2C /* camera.cpp in Sources */,

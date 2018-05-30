@@ -1,5 +1,7 @@
 #pragma once
 
+#include <SDL2/SDL_rect.h>
+
 namespace util {
     
     struct xy
@@ -58,6 +60,26 @@ namespace util {
             x /= arg.x;
             y /= arg.y;
         }
+        
+        void operator += (float arg) {
+            x += arg;
+            y += arg;
+        }
+        
+        void operator -= (float arg) {
+            x -= arg;
+            y -= arg;
+        }
+        
+        void operator *= (float arg) {
+            x *= arg;
+            y *= arg;
+        }
+        
+        void operator /= (float arg) {
+            x /= arg;
+            y /= arg;
+        }
     };
     
     struct v2
@@ -72,12 +94,6 @@ namespace util {
         xy xy;
         float w;
         float h;
-        
-//        aabb(aabb &aabb) {
-//            xy = aabb.xy;
-//            w = aabb.w;
-//            h = aabb.h;
-//        }
         
         inline float l() {
             return xy.x;
@@ -161,6 +177,10 @@ namespace util {
         
         void centerOn(struct xy arg) {
             xy = arg - center();
+        }
+        
+        SDL_Rect toSDL() {
+            return SDL_Rect{ (int)xy.x, (int)xy.y, (int)w, (int)h };
         }
     };
     

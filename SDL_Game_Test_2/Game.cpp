@@ -33,7 +33,7 @@ void Game::init(const char* title, int xpos, int ypos, int width, int height, bo
     if (SDL_Init(SDL_INIT_EVERYTHING) == 0)
     {
         window = SDL_CreateWindow(title, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, width, height, flags);
-        renderer = SDL_CreateRenderer(window, -1, 0);
+        renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_PRESENTVSYNC | SDL_RENDERER_ACCELERATED);
         if (renderer) {
             SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
             printf("Renderer created!\n");
@@ -46,6 +46,7 @@ void Game::init(const char* title, int xpos, int ypos, int width, int height, bo
     player->setWidth(PLAYER_WIDTH);
     player->setHeight(PLAYER_HEIGHT);
     player->setPos({TILESIZE * 2, TILESIZE * 2});
+    
     camera = new Camera();
     camera->body = aabb{
         xy{0, 0},
@@ -55,6 +56,26 @@ void Game::init(const char* title, int xpos, int ypos, int width, int height, bo
     camera->body.centerOn(player->getBody().center());
     
     map = 0;
+    
+//    {
+//        int row = 0;
+//        int col = 0;
+//        xy start;
+//        for (vector<int> i : maps[map]) {
+//
+//            for (int j : i) {
+//                if (j == 'P') {
+//                    start = {(float)row,(float)col};
+//                    start *= (float)TILESIZE;
+//                    printf("FOUND 'P' %i, %i\n", row, col);
+//                }
+//                ++col;
+//            }
+//            col = 0;
+//            ++row;
+//        }
+//        player->setPos(start);
+//    }
 }
 
 void Game::step()
@@ -70,11 +91,14 @@ void Game::step()
     
     // movement down
     if (player->getVel().y > 0) {
+        
+        // check for collision
+        
         float dist = 0;
-        while (mapTileXY(player->getBody().bl()).y < maps[map].size()
-               && mapTileXY(player->getBody().br()).y < maps[map].size()
-               && mapTile({player->getBody().l(), player->getBody().b() + dist + 1}) != 1
-               && mapTile({player->getBody().r(), player->getBody().b() + dist + 1}) != 1) {
+        while (getMapTileXY(player->getBody().bl()).y < maps[map].size()
+               && getMapTileXY(player->getBody().br()).y < maps[map].size()
+               && getMapTileVal({player->getBody().l(), player->getBody().b() + dist + 1}) != 1
+               && getMapTileVal({player->getBody().r(), player->getBody().b() + dist + 1}) != 1) {
             ++dist;
         }
         dist = min(player->getVel().y, dist);
@@ -91,10 +115,10 @@ void Game::step()
     // movement up
     else if (player->getVel().y < 0) {
         float dist = 0;
-        while (mapTileXY(player->getBody().tl()).y > 0
-               && mapTileXY(player->getBody().tr()).y > 0
-               && mapTile({player->getBody().l(), player->getBody().t() - dist - 1}) != 1
-               && mapTile({player->getBody().r(), player->getBody().t() - dist - 1}) != 1) {
+        while (getMapTileXY(player->getBody().tl()).y > 0
+               && getMapTileXY(player->getBody().tr()).y > 0
+               && getMapTileVal({player->getBody().l(), player->getBody().t() - dist - 1}) != 1
+               && getMapTileVal({player->getBody().r(), player->getBody().t() - dist - 1}) != 1) {
             ++dist;
         }
         dist = min(-player->getVel().y, dist);
@@ -106,11 +130,11 @@ void Game::step()
     // movement right
     if (player->getVel().x > 0) {
         float dist = 0;
-        while (mapTileXY(player->getBody().tr()).x < maps[map][0].size()
-               && mapTileXY(player->getBody().br()).x < maps[map][0].size()
-               && mapTile({player->getBody().r() + dist + 1, player->getBody().t()}) != 1
-               && mapTile({player->getBody().r() + dist + 1, player->getBody().center().y}) != 1
-               && mapTile({player->getBody().r() + dist + 1, player->getBody().b()}) != 1) {
+        while (getMapTileXY(player->getBody().tr()).x < maps[map][0].size()
+               && getMapTileXY(player->getBody().br()).x < maps[map][0].size()
+               && getMapTileVal({player->getBody().r() + dist + 1, player->getBody().t()}) != 1
+               && getMapTileVal({player->getBody().r() + dist + 1, player->getBody().center().y}) != 1
+               && getMapTileVal({player->getBody().r() + dist + 1, player->getBody().b()}) != 1) {
             ++dist;
         }
         dist = min(player->getVel().x, dist);
@@ -120,11 +144,11 @@ void Game::step()
     }
     else if (player->getVel().x < 0) {
         float dist = 0;
-        while (mapTileXY(player->getBody().tl()).x > 0
-               && mapTileXY(player->getBody().bl()).x > 0
-               && mapTile({player->getBody().l() - dist - 1, player->getBody().t()}) != 1
-               && mapTile({player->getBody().l() - dist - 1, player->getBody().center().y}) != 1
-               && mapTile({player->getBody().l() - dist - 1, player->getBody().b()}) != 1) {
+        while (getMapTileXY(player->getBody().tl()).x > 0
+               && getMapTileXY(player->getBody().bl()).x > 0
+               && getMapTileVal({player->getBody().l() - dist - 1, player->getBody().t()}) != 1
+               && getMapTileVal({player->getBody().l() - dist - 1, player->getBody().center().y}) != 1
+               && getMapTileVal({player->getBody().l() - dist - 1, player->getBody().b()}) != 1) {
             ++dist;
         }
         dist = min(-player->getVel().x, dist);
@@ -152,67 +176,56 @@ void Game::render()
     SDL_SetRenderDrawColor(renderer, 0x00, 0x00, 0x00, 0x00);
     SDL_RenderClear(renderer);
     
-    SDL_SetRenderDrawColor(renderer, 0xff, 0xff, 0xff, 0xff);
-    
     // draw map
     {
         int col = 0;
         int row = 0;
         int map = 0;
-        for (vector<vector<int>> i : maps) // draw map tiles
-        {
-            for (vector<int> j : i) {
-                for (int k : j) {
-                    switch (k) {
-                            
-                        case 0:
-                            break;
-                            
-                        case 1: {
-                            SDL_SetRenderDrawColor(renderer, 0xff, 0xff, 0xff, 0xff);
-                            SDL_Rect rect = {
-                                col * TILESIZE - (int)camera->body.l(),
-                                row * TILESIZE - (int)camera->body.t(),
-                                TILESIZE,
-                                TILESIZE
-                            };
-                            SDL_RenderFillRect(renderer, &rect);
-                        } break;
-                            
-                        case 2: {
-                            Sint16 vx[] = {
-                                (Sint16) (col * TILESIZE + TILESIZE / 2),
-                                (Sint16) (col * TILESIZE + TILESIZE),
-                                (Sint16) (col * TILESIZE),
-                                (Sint16) (col * TILESIZE + TILESIZE / 2),
-                            };
-                            for (Sint16& i : vx)
-                                i -= (int)camera->body.l();
-                            Sint16 vy[] = {
-                                (Sint16) (row * TILESIZE),
-                                (Sint16) (row * TILESIZE + TILESIZE),
-                                (Sint16) (row * TILESIZE + TILESIZE),
-                                (Sint16) (row * TILESIZE)
-                            };
-                            for (Sint16& i : vy)
-                                i -= (int)camera->body.t();
-                            filledPolygonRGBA(renderer, vx, vy, 4, 0xff, 0x00, 0x00, 0xff);
-                            
-                        } break;
-                            
-                        default:
-                            break;
-                    }
-                    if (k == 1) {
+        for (vector<int> j : maps[map]) { // draw map tiles
+            for (int k : j) {
+                switch (k) {
+                    case 0:
+                        break;
                         
-                    }
-                    col++;
+                    case 1: {
+                        SDL_Rect rect = {
+                            col * TILESIZE - (int)camera->body.l(),
+                            row * TILESIZE - (int)camera->body.t(),
+                            TILESIZE,
+                            TILESIZE
+                        };
+                        SDL_SetRenderDrawColor(renderer, 0xff, 0xff, 0xff, 0xa0);
+                        SDL_RenderFillRect(renderer, &rect);
+                    } break;
+                        
+                    case 2: {
+                        Sint16 vx[] = {
+                            (Sint16) (col * TILESIZE + TILESIZE / 2),
+                            (Sint16) (col * TILESIZE + TILESIZE),
+                            (Sint16) (col * TILESIZE),
+                            (Sint16) (col * TILESIZE + TILESIZE / 2),
+                        };
+                        for (Sint16& i : vx)
+                            i = getScreenXY(xy{(float)i, 0}).x;
+                        Sint16 vy[] = {
+                            (Sint16) (row * TILESIZE),
+                            (Sint16) (row * TILESIZE + TILESIZE),
+                            (Sint16) (row * TILESIZE + TILESIZE),
+                            (Sint16) (row * TILESIZE)
+                        };
+                        for (Sint16& i : vy)
+                            i = getScreenXY(xy{0, (float)i}).y;
+                        filledPolygonRGBA(renderer, vx, vy, 4, 0xff, 0xff, 0xff, 0x60);
+                        
+                    } break;
+                        
+                    default:
+                        break;
                 }
-                col = 0;
-                row++;
+                col++;
             }
-            row = 0;
-            map++;
+            col = 0;
+            row++;
         }
     }
     
@@ -238,21 +251,51 @@ void Game::render()
         for (Sint16& i : vy)
             i -= (int)camera->body.t();
         
-        if (grounded(player->getBody()))
-        	filledPolygonRGBA(renderer, vx, vy, 5, 0x00, 0xff, 0x00, 0xc0);
-        else
-            filledPolygonRGBA(renderer, vx, vy, 5, 0x00, 0xff, 0x00, 0x80);
+        
+        filledPolygonRGBA(renderer, vx, vy, 5, 0xff, 0xff, 0xff, 0xfe);
+//        SDL_SetRenderDrawColor(renderer, 0xff, 0xff, 0xff, 0xa0);
     }
+    
     
     
     // do dev mode
     if (DEV_MODE)
     {
-        // draw player overlapping map tiles
-        xy tlxy = mapTileXY(player->getBody().tl() - camera->body.tl());
-        xy trxy = mapTileXY(player->getBody().tr() - camera->body.tr());
-        xy blxy = mapTileXY(player->getBody().bl() - camera->body.bl());
-        xy brxy = mapTileXY(player->getBody().br() - camera->body.br());
+        // test gfx performance
+        {
+            for (int i = 0; i < 300; ++i) {
+                Sint16 first = (Sint16)(TILESIZE * WINDOW_SIZE_TILES_HEIGHT / ((rand() % 10)+1));
+                Sint16 vx[] = {
+                    first,
+                    (Sint16)(first + rand() % 100),
+                    (Sint16)(first + rand() % 100),
+                    first
+                };
+                Sint16 vy[] = {
+                    first,
+                    (Sint16)(first + rand() % 100),
+                    (Sint16)(first + rand() % 100),
+                    first
+                };
+                filledPolygonRGBA(renderer, vx, vy, 4, 0xff, 0xff, 0xff, 0x20);
+//                printf("%i ", rand() % 10);
+            }
+        }
+        
+        
+        // draw camera give-box
+        aabb cameraBox = aabb {
+            0, 0, 114, 260
+        };
+        cameraBox.centerOn(xy{WINDOW_SIZE_TILES_WIDTH * TILESIZE / 2, WINDOW_SIZE_TILES_HEIGHT * TILESIZE / 2});
+        rectangleRGBA(renderer, cameraBox.l(), cameraBox.t(), cameraBox.r(), cameraBox.b(), 0xff, 0xff, 0x00, 0xff);
+        
+        // draw player-overlapped map tiles
+        xy tlxy = getMapTileXY(player->getBody().tl() - camera->body.tl());
+        xy trxy = getMapTileXY(player->getBody().tr() - camera->body.tl());
+        xy blxy = getMapTileXY(player->getBody().bl() - camera->body.tl());
+        xy brxy = getMapTileXY(player->getBody().br() - camera->body.tl());
+        
         SDL_Rect tlRect = SDL_Rect{
             (int)tlxy.x * TILESIZE,
             (int)tlxy.y * TILESIZE,
@@ -367,6 +410,13 @@ void Game::handleEvents()
                     case SDLK_e:
                         keysDown[E] = true;
                         break;
+                        
+                    case SDLK_BACKQUOTE:
+                        if (DEV_MODE)
+                            DEV_MODE = false;
+                        else
+                            DEV_MODE = true;
+                        
                     default: break;
                 }
                 break;
@@ -374,8 +424,6 @@ void Game::handleEvents()
                 
             case SDL_KEYUP:
             {
-//                printf("key up\n");
-                
                 switch (event.key.keysym.sym)
                 {
                     case SDLK_w:
@@ -400,6 +448,7 @@ void Game::handleEvents()
                     case SDLK_e:
                         keysDown[E] = false;
                         break;
+                        
                     default: break;
                 }
                 break;
@@ -411,26 +460,38 @@ void Game::handleEvents()
     }
 }
 
-xy Game::mapTileXY(xy xy)
-{
+xy Game::getMapTileXY(xy arg) {
     return {
-        (float)((int)xy.x / (int) TILESIZE),
-        (float)((int)xy.y / (int) TILESIZE)
+        (float)((int)arg.x / (int) TILESIZE),
+        (float)((int)arg.y / (int) TILESIZE)
     };
 }
 
-int Game::mapTile(xy xy)
-{
-    xy = mapTileXY(xy);
-    return maps[map][xy.y][xy.x];
+// TODO: update for camera z-position
+xy Game::getScreenXY(xy arg) {
+    return {arg.x - camera->body.l(), arg.y - camera->body.t()};
 }
 
-bool Game::grounded(aabb aabb) {
-    return mapTile({aabb.l(), aabb.b() + 1}) == 1 || mapTile({aabb.r(), aabb.b() + 1}) == 1;
+int Game::getScreenX(int arg) {
+    return arg - camera->body.l();
 }
 
-int Game::groundedTile(xy xy) {
-    return mapTile(xy);
+int Game::getScreenY(int arg) {
+    return arg - camera->body.t();
+}
+
+int Game::getMapTileVal(xy arg) {
+    arg = getMapTileXY(arg);
+    return maps[map][arg.y][arg.x];
+}
+
+bool Game::isGrounded(aabb arg) {
+    return getMapTileVal({arg.l(), arg.b() + 1}) == 1 ||
+           getMapTileVal({arg.r(), arg.b() + 1}) == 1;
+}
+
+int Game::groundedTile(xy arg) {
+    return getMapTileVal(arg);
 }
             
 void Game::clean()

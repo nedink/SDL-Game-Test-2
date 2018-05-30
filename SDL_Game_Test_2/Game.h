@@ -34,10 +34,12 @@ public:
     void render();
     void clean();
     
-    xy mapTileXY(xy xy);
-    int mapTile(xy xy);
-    
-    bool grounded(aabb aabb);
+    xy getScreenXY(xy xy);
+    int getScreenX(int arg);
+    int getScreenY(int arg);
+    xy getMapTileXY(xy xy);
+    int getMapTileVal(xy xy);
+    bool isGrounded(aabb aabb);
     int groundedTile(xy xy);
     
     static void AddTile(int id, int x, int y);
@@ -54,6 +56,10 @@ public:
     Player* player;
     Camera* camera;
     u_long ticks = 0;
+    
+    bool DEV_MODE;
+    
+    bool red = false;
     
 //    float timeStep = 1.0f / 60.0f;
     int velocityIterations = 6;

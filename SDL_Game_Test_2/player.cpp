@@ -66,7 +66,7 @@ void Player::doWeakForces()
     else {
         if (vel.x < 0)
         {
-            if (game->grounded(body))
+            if (game->isGrounded(body))
                 applyForce({DE_ACC_GROUND, 0});
             else
                 applyForce({DE_ACC_AIR, 0});
@@ -74,7 +74,7 @@ void Player::doWeakForces()
                 setVel({0, vel.y});
         }
         else if (vel.x > 0) {
-            if (game->grounded(body))
+            if (game->isGrounded(body))
                 applyForce({-DE_ACC_GROUND, 0});
             else
                 applyForce({-DE_ACC_AIR, 0});
@@ -84,7 +84,7 @@ void Player::doWeakForces()
     }
     
     // jump
-    if (game->grounded(body)) {
+    if (game->isGrounded(body)) {
         if (game->keysDown[W]) {
             if (!jumped) {
                 applyForce({0, -JUMP_VEL});
