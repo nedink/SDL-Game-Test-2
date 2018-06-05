@@ -7,16 +7,24 @@
 
 #include <stdio.h>
 #include <vector>
+#include <map>
 
 #include "values.h"
-
-#include "player.h"
-#include "camera.h"
+#include "physics.h"
 
 #define DEGTORAD 0.0174532925199432957f
 #define RADTODEG 57.295779513082320876f
 
 class Player;
+class Camera;
+class Bullet;
+
+enum keys {
+    W, A, S, D,
+    Q, E,
+    UP, DOWN, LEFT, RIGHT,
+    SPACE,
+};
 
 class Game {
 public:
@@ -26,7 +34,7 @@ public:
     Game(const Game &game);
     ~Game();
     
-    void init(const char* title, int xpos, int ypos, int width, int height, bool fullscrean);
+    void init();
     
     void handleEvents();
     void step();
@@ -34,34 +42,34 @@ public:
     void render();
     void clean();
     
-    xy getScreenXY(xy xy);
+    geom::xy getScreenXY(geom::xy xy);
     int getScreenX(int arg);
     int getScreenY(int arg);
-    xy getMapTileXY(xy xy);
-    int getMapTileVal(xy xy);
-    bool isGrounded(aabb aabb);
-    int groundedTile(xy xy);
+    geom::xy getMapTileXY(geom::xy xy);
+    int getMapTileVal(geom::xy xy);
+    bool isGrounded(geom::aabb aabb);
+    int groundedTile(geom::xy xy);
     
     static void AddTile(int id, int x, int y);
     static SDL_Renderer* renderer;
     static SDL_Event event;
     
-    std::vector<bool> keysDown = {false, false, false, false, false, false};
+    std::map<keys, bool> keysDown;
     
     int FPS = DEFAULT_FPS;
     
     Game* prevFrame = nullptr;
     bool mouseDown = false;
     bool jumped = false;
-    xy mouse;
-    line mouseIndicator;
+    geom::xy mouse;
+    geom::line mouseIndicator;
     Player* player;
+    std::vector<Bullet*> bullets;
     Camera* camera;
     u_long ticks = 0;
+    int reloadTicks = 0;
     
     bool DEV_MODE;
-    
-    bool red = false;
     
 //    float timeStep = 1.0f / 60.0f;
     int velocityIterations = 6;
@@ -72,11 +80,4 @@ public:
 private:
     int count = 0;
     SDL_Window *window;
-};
-
-enum keys {
-    W, A, S, D,
-    Q, E,
-    UP, DOWN, LEFT, RIGHT,
-    SPACE,
 };

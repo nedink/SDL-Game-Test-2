@@ -16,7 +16,7 @@
 #define PLAYER_HEIGHT 		63
 #define RECOVER_TIME        60
 
-#define JUMP_VEL			0x2a // original: 0x0a
+#define JUMP_VEL			0x18 // original: 0x0a
 #define GRAV				0x01p-1 /* 1/16 */ // not used??
 #define FALL_VEL_FAST 		0x0.6p1
 #define FALL_VEL_SLOW 		0x0.2cp1
@@ -24,7 +24,7 @@
 #define ACC_AIR 			0x0.1p1
 #define DE_ACC_GROUND 		0x0.4p1
 #define DE_ACC_AIR 			0x0.02p1
-#define MAX_VEL_X 			0x04
+#define MAX_VEL_X 			0x06
 #define MAX_VEL_Y 			0x2a // original: 0x0a
 
 

@@ -15,6 +15,7 @@
 		6363B04720AE1A6800419C2C /* Game.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6363B04620AE1A6800419C2C /* Game.cpp */; };
 		6363B05120AFC48100419C2C /* player.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6363B05020AFC48100419C2C /* player.cpp */; };
 		6363B05320AFC52000419C2C /* camera.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6363B05220AFC52000419C2C /* camera.cpp */; };
+		63ED152C20C23B9F00C7199F /* bullet.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 63ED152B20C23B9F00C7199F /* bullet.cpp */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -46,6 +47,9 @@
 		6363B05220AFC52000419C2C /* camera.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = camera.cpp; sourceTree = "<group>"; };
 		6363B05420AFC52A00419C2C /* camera.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = camera.h; sourceTree = "<group>"; };
 		6363B05820AFCCCF00419C2C /* util.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = util.h; sourceTree = "<group>"; };
+		63CBED4C20C31097007EFD24 /* physics.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = physics.h; sourceTree = "<group>"; };
+		63ED152B20C23B9F00C7199F /* bullet.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = bullet.cpp; sourceTree = "<group>"; };
+		63ED152D20C23BA900C7199F /* bullet.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = bullet.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -82,6 +86,8 @@
 		6363B03620A8B5E900419C2C /* SDL_Game_Test_2 */ = {
 			isa = PBXGroup;
 			children = (
+				63CBED4D20C33399007EFD24 /* phys_objs */,
+				63CBED4B20C30F2E007EFD24 /* util */,
 				633F3D0B20B7923E00BB72CE /* values.h */,
 				6363B03720A8B5E900419C2C /* main.cpp */,
 				6363B04520AE1A3D00419C2C /* Game.h */,
@@ -90,10 +96,11 @@
 				6363B05020AFC48100419C2C /* player.cpp */,
 				6363B05420AFC52A00419C2C /* camera.h */,
 				6363B05220AFC52000419C2C /* camera.cpp */,
-				6363B05820AFCCCF00419C2C /* util.h */,
 				6363B04E20AE677F00419C2C /* maps.h */,
 				6329D32320BCB4060058E3C2 /* quadTree.h */,
 				6329D32420BCB41A0058E3C2 /* quadTree.cpp */,
+				63ED152D20C23BA900C7199F /* bullet.h */,
+				63ED152B20C23B9F00C7199F /* bullet.cpp */,
 			);
 			path = SDL_Game_Test_2;
 			sourceTree = "<group>";
@@ -106,6 +113,22 @@
 				6363B03F20A8B6A100419C2C /* SDL2.framework */,
 			);
 			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		63CBED4B20C30F2E007EFD24 /* util */ = {
+			isa = PBXGroup;
+			children = (
+				6363B05820AFCCCF00419C2C /* util.h */,
+				63CBED4C20C31097007EFD24 /* physics.h */,
+			);
+			path = util;
+			sourceTree = "<group>";
+		};
+		63CBED4D20C33399007EFD24 /* phys_objs */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = phys_objs;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -166,6 +189,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				6363B05120AFC48100419C2C /* player.cpp in Sources */,
+				63ED152C20C23B9F00C7199F /* bullet.cpp in Sources */,
 				6329D32520BCB41A0058E3C2 /* quadTree.cpp in Sources */,
 				6363B03820A8B5E900419C2C /* main.cpp in Sources */,
 				6363B04720AE1A6800419C2C /* Game.cpp in Sources */,

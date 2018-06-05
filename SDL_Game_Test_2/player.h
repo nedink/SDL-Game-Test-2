@@ -1,21 +1,13 @@
-
 #pragma once
 
-#include "util.h"
-#include "Game.h"
-
-using namespace util;
+#include "physics.h"
 
 class Game;
 
-class Player {
+class Player : public phys::PhysObj {
 
 private:
     Game* game;
-    
-    aabb body;
-    xy pos;
-    xy vel;
     
 public:
     Player(Game* game_);
@@ -24,19 +16,6 @@ public:
     
     bool injured = false;
     bool jumped = false;
-    
-    void setWidth(float w);
-    void setHeight(float h);
-    void setPos(xy xy);
-    void setVel(xy xy);
-    
-    void applyForce(xy xy);
-    void displace(xy xy);
-    void moveTo(xy xy);
-    
-    xy getPos();
-    xy getVel();
-	aabb getBody();
     
     void doWeakForces();
 };

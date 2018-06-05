@@ -1,8 +1,8 @@
 #pragma once
 
-using namespace std;
+#include <vector>
 
-vector<vector<vector<int>>> maps = {
+std::vector<std::vector<std::vector<int>>> maps = {
     {
         // 1
         {1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1},

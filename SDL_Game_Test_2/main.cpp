@@ -20,12 +20,7 @@ int main(int argc, const char * argv[]) {
     Uint32 frameTime;
     
     game = new Game();
-    game->init("Game",
-               SDL_WINDOWPOS_CENTERED,
-               SDL_WINDOWPOS_CENTERED,
-               TILESIZE * WINDOW_SIZE_TILES_WIDTH,
-               TILESIZE * WINDOW_SIZE_TILES_HEIGHT,
-               false);
+    game->init();
     
     while (game->running()) {
         
@@ -38,8 +33,6 @@ int main(int argc, const char * argv[]) {
         game->render();
         
         frameTime = SDL_GetTicks() - frameStart;
-        
-        printf("%i\n", frameTime);
         
         (frameDelay > frameTime) ? SDL_Delay(frameDelay - frameTime) : SDL_Delay(0);
     }

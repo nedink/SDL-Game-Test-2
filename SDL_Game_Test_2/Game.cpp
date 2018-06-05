@@ -1,10 +1,13 @@
 #include <stdio.h>
 #include <math.h>
 
+#include <string>
+
 #include "Game.h"
 #include "maps.h"
-
-using namespace std;
+#include "player.h"
+#include "bullet.h"
+#include "camera.h"
 
 SDL_Renderer* Game::renderer = nullptr;
 SDL_Event Game::event;
@@ -21,26 +24,19 @@ Game::Game(const Game &game)
 Game::~Game()
 {}
 
-void Game::init(const char* title, int xpos, int ypos, int width, int height, bool fullscrean)
+void Game::init()
 {
     int flags = 0;
+//    flags += SDL_WINDOW_FULLSCREEN;
     
-    if (fullscrean)
-    {
-        flags = SDL_WINDOW_FULLSCREEN;
+    window = SDL_CreateWindow("Game", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, WINDOW_SIZE_TILES_WIDTH*TILESIZE, WINDOW_SIZE_TILES_HEIGHT*TILESIZE, flags);
+    renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_PRESENTVSYNC | SDL_RENDERER_ACCELERATED);
+    if (renderer) {
+        SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
+        printf("Renderer created!\n");
     }
     
-    if (SDL_Init(SDL_INIT_EVERYTHING) == 0)
-    {
-        window = SDL_CreateWindow(title, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, width, height, flags);
-        renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_PRESENTVSYNC | SDL_RENDERER_ACCELERATED);
-        if (renderer) {
-            SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
-            printf("Renderer created!\n");
-        }
-        
-        isRunning = true;
-    }
+    isRunning = true;
     
     player = new Player(this);
     player->setWidth(PLAYER_WIDTH);
@@ -48,12 +44,10 @@ void Game::init(const char* title, int xpos, int ypos, int width, int height, bo
     player->setPos({TILESIZE * 2, TILESIZE * 2});
     
     camera = new Camera();
-    camera->body = aabb{
-        xy{0, 0},
-        TILESIZE * WINDOW_SIZE_TILES_WIDTH,
-        TILESIZE * WINDOW_SIZE_TILES_HEIGHT
-    };
-    camera->body.centerOn(player->getBody().center());
+    camera->setPos({0, 0});
+    camera->setWidth(TILESIZE * WINDOW_SIZE_TILES_WIDTH);
+    camera->setHeight(TILESIZE * WINDOW_SIZE_TILES_HEIGHT);
+    camera->centerOn(player->center());
     
     map = 0;
     
@@ -81,13 +75,35 @@ void Game::init(const char* title, int xpos, int ypos, int width, int height, bo
 void Game::step()
 {
     ++ticks;
-//    printf("ticks: %li\n", ticks);
+    reloadTicks -= reloadTicks > 0 ? 1 : 0;
+    
+    
+    // update bullets
+    for (auto bullet : bullets) {
+        bullet->update();
+//        printf("%f, %f\n", bullet)
+    }
+    
+    // spawn bullet
+    if (mouseDown && reloadTicks == 0) {
+        reloadTicks = 60;
+        Bullet* b = new Bullet();
+        b->setWidth(2);
+        b->setHeight(2);
+        b->setPos(player->getPos());
+        printf("player pos: %f, %f\n", player->getPos().x, player->getPos().y);
+        b->setVel({8, 0});
+        geom::xy mouseXY = getScreenXY(mouse);
+        geom::xy spawnPos = getScreenXY(player->getPos());
+        bullets.push_back(b);
+    }
+    
     
     // apply weak forces (input, dynamic) to player
     player->doWeakForces();
     
     // apply strong forces (corrective) to player
-    player->applyForce(xy{0, keysDown[W] ? (float)FALL_VEL_SLOW : (float)FALL_VEL_FAST});
+    player->applyForce(geom::xy{0, keysDown[W] ? (float)FALL_VEL_SLOW : (float)FALL_VEL_FAST});
     
     // movement down
     if (player->getVel().y > 0) {
@@ -95,13 +111,13 @@ void Game::step()
         // check for collision
         
         float dist = 0;
-        while (getMapTileXY(player->getBody().bl()).y < maps[map].size()
-               && getMapTileXY(player->getBody().br()).y < maps[map].size()
-               && getMapTileVal({player->getBody().l(), player->getBody().b() + dist + 1}) != 1
-               && getMapTileVal({player->getBody().r(), player->getBody().b() + dist + 1}) != 1) {
+        while (getMapTileXY(player->bl()).y < maps[map].size()
+               && getMapTileXY(player->br()).y < maps[map].size()
+               && getMapTileVal({player->l(), player->b() + dist + 1}) != 1
+               && getMapTileVal({player->r(), player->b() + dist + 1}) != 1) {
             ++dist;
         }
-        dist = min(player->getVel().y, dist);
+        dist = std::min(player->getVel().y, dist);
         if (dist < player->getVel().y) {
             // bounce (funny but dumb)
 //            player->setVel({player->getVel().x, -(player->getVel().y/2)});
@@ -115,13 +131,13 @@ void Game::step()
     // movement up
     else if (player->getVel().y < 0) {
         float dist = 0;
-        while (getMapTileXY(player->getBody().tl()).y > 0
-               && getMapTileXY(player->getBody().tr()).y > 0
-               && getMapTileVal({player->getBody().l(), player->getBody().t() - dist - 1}) != 1
-               && getMapTileVal({player->getBody().r(), player->getBody().t() - dist - 1}) != 1) {
+        while (getMapTileXY(player->tl()).y > 0
+               && getMapTileXY(player->tr()).y > 0
+               && getMapTileVal({player->l(), player->t() - dist - 1}) != 1
+               && getMapTileVal({player->r(), player->t() - dist - 1}) != 1) {
             ++dist;
         }
-        dist = min(-player->getVel().y, dist);
+        dist = std::min(-player->getVel().y, dist);
         if (-dist != player->getVel().y)
             player->setVel({player->getVel().x, 0});
         player->displace({0, -dist});
@@ -130,28 +146,28 @@ void Game::step()
     // movement right
     if (player->getVel().x > 0) {
         float dist = 0;
-        while (getMapTileXY(player->getBody().tr()).x < maps[map][0].size()
-               && getMapTileXY(player->getBody().br()).x < maps[map][0].size()
-               && getMapTileVal({player->getBody().r() + dist + 1, player->getBody().t()}) != 1
-               && getMapTileVal({player->getBody().r() + dist + 1, player->getBody().center().y}) != 1
-               && getMapTileVal({player->getBody().r() + dist + 1, player->getBody().b()}) != 1) {
+        while (getMapTileXY(player->tr()).x < maps[map][0].size()
+               && getMapTileXY(player->br()).x < maps[map][0].size()
+               && getMapTileVal({player->r() + dist + 1, player->t()}) != 1
+               && getMapTileVal({player->r() + dist + 1, player->center().y}) != 1
+               && getMapTileVal({player->r() + dist + 1, player->b()}) != 1) {
             ++dist;
         }
-        dist = min(player->getVel().x, dist);
+        dist = std::min(player->getVel().x, dist);
         if (dist != player->getVel().x)
             player->setVel({0, player->getVel().y});
         player->displace({dist, 0});
     }
     else if (player->getVel().x < 0) {
         float dist = 0;
-        while (getMapTileXY(player->getBody().tl()).x > 0
-               && getMapTileXY(player->getBody().bl()).x > 0
-               && getMapTileVal({player->getBody().l() - dist - 1, player->getBody().t()}) != 1
-               && getMapTileVal({player->getBody().l() - dist - 1, player->getBody().center().y}) != 1
-               && getMapTileVal({player->getBody().l() - dist - 1, player->getBody().b()}) != 1) {
+        while (getMapTileXY(player->tl()).x > 0
+               && getMapTileXY(player->bl()).x > 0
+               && getMapTileVal({player->l() - dist - 1, player->t()}) != 1
+               && getMapTileVal({player->l() - dist - 1, player->center().y}) != 1
+               && getMapTileVal({player->l() - dist - 1, player->b()}) != 1) {
             ++dist;
         }
-        dist = min(-player->getVel().x, dist);
+        dist = std::min(-player->getVel().x, dist);
         if (-dist != player->getVel().x)
             player->setVel({0, player->getVel().y});
         player->displace({-dist, 0});
@@ -159,15 +175,17 @@ void Game::step()
     
     // max velocity
     player->setVel({player->getVel().x < 0 ?
-        max(player->getVel().x, (float)-MAX_VEL_X) : min(player->getVel().x, (float)MAX_VEL_X),
-        player->getVel().y < 0 ? max(player->getVel().y, (float)-MAX_VEL_Y) : min(player->getVel().y, (float)MAX_VEL_Y)});
+        std::max(player->getVel().x, (float)-MAX_VEL_X) : std::min(player->getVel().x, (float)MAX_VEL_X),
+        player->getVel().y < 0 ? std::max(player->getVel().y, (float)-MAX_VEL_Y) : std::min(player->getVel().y, (float)MAX_VEL_Y)});
+    
+    
     
     // center camera on player
-    camera->target = player->getBody().center();
+    camera->target = player->center();
     camera->update();
     
     // mouse indicator
-    mouseIndicator.head = player->getBody().center();
+    mouseIndicator.start = player->center();
     mouseIndicator.end = mouse;
 }
 
@@ -176,12 +194,26 @@ void Game::render()
     SDL_SetRenderDrawColor(renderer, 0x00, 0x00, 0x00, 0x00);
     SDL_RenderClear(renderer);
     
+    // draw bullets
+    for (auto& bullet : bullets) {
+        geom::aabb rectAabb = bullet->getBody();
+        rectAabb = getScreenXY(rectAabb.tl());
+//        rectAabb -= camera->tl();
+        
+        SDL_Rect rect = rectAabb.toSDL();
+        
+        SDL_SetRenderDrawColor(renderer, 0xff, 0xff, 0xff, 0xff);
+        SDL_RenderDrawRect(renderer, &rect);
+//        printf("bullet: \n  x: %f, \n  y: %f\n", bullet->getPos().x, bullet->getPos().y);
+    }
+//    printf("bullets: %i\n", (int)bullets.size());
+    
     // draw map
     {
         int col = 0;
         int row = 0;
         int map = 0;
-        for (vector<int> j : maps[map]) { // draw map tiles
+        for (std::vector<int> j : maps[map]) { // draw map tiles
             for (int k : j) {
                 switch (k) {
                     case 0:
@@ -189,8 +221,8 @@ void Game::render()
                         
                     case 1: {
                         SDL_Rect rect = {
-                            col * TILESIZE - (int)camera->body.l(),
-                            row * TILESIZE - (int)camera->body.t(),
+                            col * TILESIZE - (int)camera->l(),
+                            row * TILESIZE - (int)camera->t(),
                             TILESIZE,
                             TILESIZE
                         };
@@ -206,7 +238,7 @@ void Game::render()
                             (Sint16) (col * TILESIZE + TILESIZE / 2),
                         };
                         for (Sint16& i : vx)
-                            i = getScreenXY(xy{(float)i, 0}).x;
+                            i = getScreenXY(geom::xy{(float)i, 0}).x;
                         Sint16 vy[] = {
                             (Sint16) (row * TILESIZE),
                             (Sint16) (row * TILESIZE + TILESIZE),
@@ -214,7 +246,7 @@ void Game::render()
                             (Sint16) (row * TILESIZE)
                         };
                         for (Sint16& i : vy)
-                            i = getScreenXY(xy{0, (float)i}).y;
+                            i = getScreenXY(geom::xy{0, (float)i}).y;
                         filledPolygonRGBA(renderer, vx, vy, 4, 0xff, 0xff, 0xff, 0x60);
                         
                     } break;
@@ -232,24 +264,24 @@ void Game::render()
     // draw player
     {
         Sint16 vx[] = {
-            (Sint16)(player->getBody().l()),
-            (Sint16)(player->getBody().r()),
-            (Sint16)(player->getBody().r()),
-            (Sint16)(player->getBody().l()),
-            (Sint16)(player->getBody().l())
+            (Sint16)(player->l()),
+            (Sint16)(player->r()),
+            (Sint16)(player->r()),
+            (Sint16)(player->l()),
+            (Sint16)(player->l())
         };
         Sint16 vy[] = {
-            (Sint16)(player->getBody().t()),
-            (Sint16)(player->getBody().t()),
-            (Sint16)(player->getBody().b()),
-            (Sint16)(player->getBody().b()),
-            (Sint16)(player->getBody().t())
+            (Sint16)(player->t()),
+            (Sint16)(player->t()),
+            (Sint16)(player->b()),
+            (Sint16)(player->b()),
+            (Sint16)(player->t())
         };
         
         for (Sint16& i : vx)
-            i -= (int)camera->body.l();
+            i -= (int)camera->l();
         for (Sint16& i : vy)
-            i -= (int)camera->body.t();
+            i -= (int)camera->t();
         
         
         filledPolygonRGBA(renderer, vx, vy, 5, 0xff, 0xff, 0xff, 0xfe);
@@ -286,17 +318,17 @@ void Game::render()
         
         
         // draw camera give-box
-        aabb cameraBox = aabb {
+        geom::aabb cameraBox = {
             0, 0, 114, 260
         };
-        cameraBox.centerOn(xy{WINDOW_SIZE_TILES_WIDTH * TILESIZE / 2, WINDOW_SIZE_TILES_HEIGHT * TILESIZE / 2});
+        cameraBox.centerOn(geom::xy{WINDOW_SIZE_TILES_WIDTH * TILESIZE / 2, WINDOW_SIZE_TILES_HEIGHT * TILESIZE / 2});
         rectangleRGBA(renderer, cameraBox.l(), cameraBox.t(), cameraBox.r(), cameraBox.b(), 0xff, 0xff, 0x00, 0xff);
         
         // draw player-overlapped map tiles
-        xy tlxy = getMapTileXY(player->getBody().tl() - camera->body.tl());
-        xy trxy = getMapTileXY(player->getBody().tr() - camera->body.tl());
-        xy blxy = getMapTileXY(player->getBody().bl() - camera->body.tl());
-        xy brxy = getMapTileXY(player->getBody().br() - camera->body.tl());
+        geom::xy tlxy = getMapTileXY(player->tl() - camera->tl());
+        geom::xy trxy = getMapTileXY(player->tr() - camera->tl());
+        geom::xy blxy = getMapTileXY(player->bl() - camera->tl());
+        geom::xy brxy = getMapTileXY(player->br() - camera->tl());
         
         SDL_Rect tlRect = SDL_Rect{
             (int)tlxy.x * TILESIZE,
@@ -334,9 +366,10 @@ void Game::render()
         
         // draw mouse indicator
         {
+            geom::xy start = getScreenXY(mouseIndicator.start);
             lineRGBA(renderer,
-                     mouseIndicator.head.x - camera->body.l(), mouseIndicator.head.y - camera->body.t(),
-                     mouseIndicator.end.x, mouseIndicator.end.y,
+                     start.x, start.y,
+                     mouse.x, mouse.y,
                      0x00, 0xff, 0x00, 0xff);
             
             rectangleRGBA(renderer,
@@ -412,12 +445,12 @@ void Game::handleEvents()
                     case SDLK_q:
                         keysDown[Q] = true;
                         if (DEV_MODE)
-                            FPS = max(FPS - 1, 1);
+                            FPS = std::max(FPS - 1, 1);
                         break;
                     case SDLK_e:
                         keysDown[E] = true;
                         if (DEV_MODE)
-                            FPS = min(FPS + 10, 120);
+                            FPS = std::min(FPS + 10, 120);
                         break;
                         
                     case SDLK_BACKQUOTE:
@@ -437,19 +470,15 @@ void Game::handleEvents()
                 {
                     case SDLK_w:
                         keysDown[W] = false;
-                        //                    keysDown[KeyboardController::keys::up] = false;
                         break;
                     case SDLK_s:
                         keysDown[S] = false;
-                        //                    keysDown[KeyboardController::keys::down] = false;
                         break;
                     case SDLK_a:
                         keysDown[A] = false;
-                        //                    keysDown[KeyboardController::keys::left] = false;
                         break;
                     case SDLK_d:
                         keysDown[D] = false;
-                        //                    keysDown[KeyboardController::keys::right] = false;
                         break;
                     case SDLK_q:
                         keysDown[Q] = false;
@@ -469,7 +498,7 @@ void Game::handleEvents()
     }
 }
 
-xy Game::getMapTileXY(xy arg) {
+geom::xy Game::getMapTileXY(geom::xy arg) {
     return {
         (float)((int)arg.x / (int) TILESIZE),
         (float)((int)arg.y / (int) TILESIZE)
@@ -477,29 +506,29 @@ xy Game::getMapTileXY(xy arg) {
 }
 
 // TODO: update for camera z-position
-xy Game::getScreenXY(xy arg) {
-    return {arg.x - camera->body.l(), arg.y - camera->body.t()};
+geom::xy Game::getScreenXY(geom::xy arg) {
+    return arg - camera->tl();
 }
 
 int Game::getScreenX(int arg) {
-    return arg - camera->body.l();
+    return arg - camera->l();
 }
 
 int Game::getScreenY(int arg) {
-    return arg - camera->body.t();
+    return arg - camera->t();
 }
 
-int Game::getMapTileVal(xy arg) {
+int Game::getMapTileVal(geom::xy arg) {
     arg = getMapTileXY(arg);
     return maps[map][arg.y][arg.x];
 }
 
-bool Game::isGrounded(aabb arg) {
+bool Game::isGrounded(geom::aabb arg) {
     return getMapTileVal({arg.l(), arg.b() + 1}) == 1 ||
            getMapTileVal({arg.r(), arg.b() + 1}) == 1;
 }
 
-int Game::groundedTile(xy arg) {
+int Game::groundedTile(geom::xy arg) {
     return getMapTileVal(arg);
 }
             

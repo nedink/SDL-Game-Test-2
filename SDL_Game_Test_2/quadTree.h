@@ -2,13 +2,10 @@
 #ifndef quadTree_h
 #define quadTree_h
 
-#include "util.h"
+#include "physics.h"
 
 #include <stdio.h>
 #include <vector>
-
-using namespace std;
-using namespace util;
 
 class QuadTree {
 private:
@@ -16,15 +13,15 @@ private:
     int MAX_LEVELS;
     
     int level;
-    vector<xy*> objects;
-    aabb bounds;
+    std::vector<geom::xy*> objects;
+    geom::aabb bounds;
     QuadTree* nodes[4];
     
     /*
      * Constructor
      */
 public:
-    QuadTree(int pLevel, aabb pBounds) {
+    QuadTree(int pLevel, geom::aabb pBounds) {
         level = pLevel;
 //        objects = new vector<xy>();
         bounds = pBounds;

@@ -4,9 +4,6 @@
 #include <stdio.h>
 #include <math.h>
 
-using namespace util;
-using namespace std;
-
 Player::Player(Game* game_)
 {
     game = game_;
@@ -19,39 +16,6 @@ Player::Player(const Player &player)
 
 Player::~Player()
 {}
-
-void Player::setWidth(float w)
-{
-    body.w = w;
-}
-
-void Player::setHeight(float h)
-{
-    body.h = h;
-}
-
-void Player::setPos(xy xy)
-{
-    pos = xy;
-    body = pos;
-}
-
-void Player::setVel(xy xy) {
-    vel = xy;
-}
-
-aabb Player::getBody() {
-    return body;
-}
-
-xy Player::getPos() {
-    return pos;
-}
-
-xy Player::getVel() {
-    return vel;
-}
-
 
 void Player::doWeakForces()
 {
@@ -85,6 +49,7 @@ void Player::doWeakForces()
     
     // jump
     if (game->isGrounded(body)) {
+//        if (game->keysDown[W]) {
         if (game->keysDown[W]) {
             if (!jumped) {
                 applyForce({0, -JUMP_VEL});
@@ -94,16 +59,4 @@ void Player::doWeakForces()
     }
     if (!game->keysDown[W])
         jumped = false;
-}
-
-void Player::applyForce(xy xy) {
-    setVel(vel + xy);
-}
-
-void Player::displace(xy xy) {
-    setPos(pos + xy);
-}
-
-void Player::moveTo(xy xy) {
-    setPos(xy);
 }

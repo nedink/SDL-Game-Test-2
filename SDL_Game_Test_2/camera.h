@@ -1,18 +1,15 @@
 #pragma once
 
-#include "util.h"
+#include "physics.h"
 
-using namespace util;
-
-class Camera {
+class Camera : public phys::PhysObj {
 
 public:
     Camera();
     Camera(const Camera& camera);
     ~Camera();
     
-    aabb body;
-    xy target;
+    geom::xy target;
     
     void update();
 };
