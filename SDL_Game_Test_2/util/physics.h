@@ -10,8 +10,11 @@
 #define physics_h
 
 #include <SDL2/SDL_rect.h>
+//#include <SDL2_gfx/SDL2_gfxPrimitives.h>
+//#include <math.h>
 
 namespace geom {
+    
     struct xy
     {
         float x;
@@ -88,7 +91,23 @@ namespace geom {
             x /= arg;
             y /= arg;
         }
+        
+        float dist(geom::xy arg) {
+            return sqrt(pow(arg.x - x, 2) + pow(arg.y - y, 2));
+        }
+        
+        static float angleOf(xy arg) {
+            return atan(arg.y / arg.x);
+        }
+        
+        static xy ofAngle(float radians) {
+//            radians *= M_PI;
+            printf("radians: %f\n", radians);
+            return xy{cos(radians), sin(radians)};
+        }
     };
+    
+    
     
     struct aabb
     {
@@ -341,6 +360,8 @@ namespace phys {
         SDL_Rect toSDL() {
             return body.toSDL();
         }
+        
+        
     };
 }
 

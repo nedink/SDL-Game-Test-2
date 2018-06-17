@@ -3,7 +3,7 @@
 
 //bool DEV_MODE = false;
 
-#define DEFAULT_FPS 120
+#define DEFAULT_FPS 60
 
 #define RENDER_SCALE 1
 

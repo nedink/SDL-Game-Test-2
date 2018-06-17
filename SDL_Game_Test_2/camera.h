@@ -1,6 +1,6 @@
 #pragma once
 
-#include "physics.h"
+#include "util/physics.h"
 
 class Camera : public phys::PhysObj {
 

@@ -1,5 +1,3 @@
-#pragma once
-
 #include "camera.h"
 
 #include <stdio.h>

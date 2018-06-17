@@ -150,6 +150,33 @@ Game.cpp.s:
 	$(MAKE) -f CMakeFiles/SDL_Game_Test_2.dir/build.make CMakeFiles/SDL_Game_Test_2.dir/Game.cpp.s
 .PHONY : Game.cpp.s
 
+bullet.o: bullet.cpp.o
+
+.PHONY : bullet.o
+
+# target to build an object file
+bullet.cpp.o:
+	$(MAKE) -f CMakeFiles/SDL_Game_Test_2.dir/build.make CMakeFiles/SDL_Game_Test_2.dir/bullet.cpp.o
+.PHONY : bullet.cpp.o
+
+bullet.i: bullet.cpp.i
+
+.PHONY : bullet.i
+
+# target to preprocess a source file
+bullet.cpp.i:
+	$(MAKE) -f CMakeFiles/SDL_Game_Test_2.dir/build.make CMakeFiles/SDL_Game_Test_2.dir/bullet.cpp.i
+.PHONY : bullet.cpp.i
+
+bullet.s: bullet.cpp.s
+
+.PHONY : bullet.s
+
+# target to generate assembly for a file
+bullet.cpp.s:
+	$(MAKE) -f CMakeFiles/SDL_Game_Test_2.dir/build.make CMakeFiles/SDL_Game_Test_2.dir/bullet.cpp.s
+.PHONY : bullet.cpp.s
+
 camera.o: camera.cpp.o
 
 .PHONY : camera.o
@@ -243,6 +270,9 @@ help:
 	@echo "... Game.o"
 	@echo "... Game.i"
 	@echo "... Game.s"
+	@echo "... bullet.o"
+	@echo "... bullet.i"
+	@echo "... bullet.s"
 	@echo "... camera.o"
 	@echo "... camera.i"
 	@echo "... camera.s"

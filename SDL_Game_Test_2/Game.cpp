@@ -2,6 +2,7 @@
 #include <math.h>
 
 #include <string>
+#include <SDL2_gfx/SDL2_gfxPrimitives.h>
 
 #include "Game.h"
 #include "maps.h"
@@ -15,11 +16,11 @@ SDL_Event Game::event;
 Game::Game()
 {}
 
-Game::Game(const Game &game)
-{
-    this->player = new Player(*player);
-    this->camera = new Camera(*camera);
-}
+//Game::Game(const Game &game)
+//{
+//    this->player = new Player(*player);
+//    this->camera = new Camera(*camera);
+//}
 
 Game::~Game()
 {}
@@ -86,18 +87,23 @@ void Game::step()
     
     // spawn bullet
     if (mouseDown && reloadTicks == 0) {
-        reloadTicks = 60;
+        reloadTicks = 10;
         Bullet* b = new Bullet();
-        b->setWidth(2);
-        b->setHeight(2);
-        b->setPos(player->getPos());
+        b->setWidth(4);
+        b->setHeight(4);
+        b->centerOn(player->center());
         printf("player pos: %f, %f\n", player->getPos().x, player->getPos().y);
-        b->setVel({8, 0});
-        geom::xy mouseXY = getScreenXY(mouse);
-        geom::xy spawnPos = getScreenXY(player->getPos());
+        b->setVel(geom::xy::ofAngle(geom::xy::angleOf(mouse - getScreenXy(b->getPos()))) + (rand() % 50) * .001 - 0.05 );
+//        geom::xy thing = ;
+//        printf("%f, %f\n", thing.x, thing.y);
+		
+        float bulletVel = 16.0f;
+        b->setVel(b->getVel() * bulletVel);
+//        printf("bullet vel: %f, %f\n", b->getVel().x, b->getVel().y);
+        geom::xy mouseXY = getScreenXy(mouse);
+        geom::xy spawnPos = getScreenXy(player->getPos());
         bullets.push_back(b);
     }
-    
     
     // apply weak forces (input, dynamic) to player
     player->doWeakForces();
@@ -111,8 +117,8 @@ void Game::step()
         // check for collision
         
         float dist = 0;
-        while (getMapTileXY(player->bl()).y < maps[map].size()
-               && getMapTileXY(player->br()).y < maps[map].size()
+        while (getMapTileXy(player->bl()).y < maps[map].size()
+               && getMapTileXy(player->br()).y < maps[map].size()
                && getMapTileVal({player->l(), player->b() + dist + 1}) != 1
                && getMapTileVal({player->r(), player->b() + dist + 1}) != 1) {
             ++dist;
@@ -131,8 +137,8 @@ void Game::step()
     // movement up
     else if (player->getVel().y < 0) {
         float dist = 0;
-        while (getMapTileXY(player->tl()).y > 0
-               && getMapTileXY(player->tr()).y > 0
+        while (getMapTileXy(player->tl()).y > 0
+               && getMapTileXy(player->tr()).y > 0
                && getMapTileVal({player->l(), player->t() - dist - 1}) != 1
                && getMapTileVal({player->r(), player->t() - dist - 1}) != 1) {
             ++dist;
@@ -146,8 +152,8 @@ void Game::step()
     // movement right
     if (player->getVel().x > 0) {
         float dist = 0;
-        while (getMapTileXY(player->tr()).x < maps[map][0].size()
-               && getMapTileXY(player->br()).x < maps[map][0].size()
+        while (getMapTileXy(player->tr()).x < maps[map][0].size()
+               && getMapTileXy(player->br()).x < maps[map][0].size()
                && getMapTileVal({player->r() + dist + 1, player->t()}) != 1
                && getMapTileVal({player->r() + dist + 1, player->center().y}) != 1
                && getMapTileVal({player->r() + dist + 1, player->b()}) != 1) {
@@ -160,8 +166,8 @@ void Game::step()
     }
     else if (player->getVel().x < 0) {
         float dist = 0;
-        while (getMapTileXY(player->tl()).x > 0
-               && getMapTileXY(player->bl()).x > 0
+        while (getMapTileXy(player->tl()).x > 0
+               && getMapTileXy(player->bl()).x > 0
                && getMapTileVal({player->l() - dist - 1, player->t()}) != 1
                && getMapTileVal({player->l() - dist - 1, player->center().y}) != 1
                && getMapTileVal({player->l() - dist - 1, player->b()}) != 1) {
@@ -197,16 +203,18 @@ void Game::render()
     // draw bullets
     for (auto& bullet : bullets) {
         geom::aabb rectAabb = bullet->getBody();
-        rectAabb = getScreenXY(rectAabb.tl());
+        rectAabb = getScreenXy(rectAabb.tl());
 //        rectAabb -= camera->tl();
         
         SDL_Rect rect = rectAabb.toSDL();
         
         SDL_SetRenderDrawColor(renderer, 0xff, 0xff, 0xff, 0xff);
-        SDL_RenderDrawRect(renderer, &rect);
-//        printf("bullet: \n  x: %f, \n  y: %f\n", bullet->getPos().x, bullet->getPos().y);
+        SDL_RenderDrawLine(renderer,
+                           (int)getScreenXy(bullet->getPos()).x,
+                           (int)getScreenXy(bullet->getPos()).y,
+                           (int)getScreenXy((bullet->getPos() - bullet->getVel())).x,
+                           (int)getScreenXy((bullet->getPos() - bullet->getVel())).y);
     }
-//    printf("bullets: %i\n", (int)bullets.size());
     
     // draw map
     {
@@ -238,7 +246,7 @@ void Game::render()
                             (Sint16) (col * TILESIZE + TILESIZE / 2),
                         };
                         for (Sint16& i : vx)
-                            i = getScreenXY(geom::xy{(float)i, 0}).x;
+                            i = getScreenXy(geom::xy{(float)i, 0}).x;
                         Sint16 vy[] = {
                             (Sint16) (row * TILESIZE),
                             (Sint16) (row * TILESIZE + TILESIZE),
@@ -246,8 +254,10 @@ void Game::render()
                             (Sint16) (row * TILESIZE)
                         };
                         for (Sint16& i : vy)
-                            i = getScreenXY(geom::xy{0, (float)i}).y;
-                        filledPolygonRGBA(renderer, vx, vy, 4, 0xff, 0xff, 0xff, 0x60);
+                            i = getScreenXy(geom::xy{0, (float)i}).y;
+                        SDL_Rect rect = {col * TILESIZE, row * TILESIZE, TILESIZE, TILESIZE};
+                        SDL_RenderDrawRect(renderer, &rect);
+//                        filledPolygonRGBA(renderer, vx, vy, 4, 0xff, 0xff, 0xff, 0x60);
                         
                     } break;
                         
@@ -282,8 +292,10 @@ void Game::render()
             i -= (int)camera->l();
         for (Sint16& i : vy)
             i -= (int)camera->t();
-        
-        
+
+        SDL_Rect rect = player->getBody().toSDL();
+
+//        SDL_RenderDrawRect(renderer, &rect);
         filledPolygonRGBA(renderer, vx, vy, 5, 0xff, 0xff, 0xff, 0xfe);
 //        SDL_SetRenderDrawColor(renderer, 0xff, 0xff, 0xff, 0xa0);
     }
@@ -311,7 +323,7 @@ void Game::render()
                     (Sint16)(first + rand() % 100),
                     first
                 };
-                filledPolygonRGBA(renderer, vx, vy, 4, 0xff, 0xff, 0xff, 0x20);
+//                filledPolygonRGBA(renderer, vx, vy, 4, 0xff, 0xff, 0xff, 0x20);
 //                printf("%i ", rand() % 10);
             }
         }
@@ -322,13 +334,15 @@ void Game::render()
             0, 0, 114, 260
         };
         cameraBox.centerOn(geom::xy{WINDOW_SIZE_TILES_WIDTH * TILESIZE / 2, WINDOW_SIZE_TILES_HEIGHT * TILESIZE / 2});
-        rectangleRGBA(renderer, cameraBox.l(), cameraBox.t(), cameraBox.r(), cameraBox.b(), 0xff, 0xff, 0x00, 0xff);
+        SDL_Rect rect = cameraBox.toSDL();
+        SDL_RenderDrawRect(renderer, &rect);
+//        rectangleRGBA(renderer, cameraBox.l(), cameraBox.t(), cameraBox.r(), cameraBox.b(), 0xff, 0xff, 0x00, 0xff);
         
         // draw player-overlapped map tiles
-        geom::xy tlxy = getMapTileXY(player->tl() - camera->tl());
-        geom::xy trxy = getMapTileXY(player->tr() - camera->tl());
-        geom::xy blxy = getMapTileXY(player->bl() - camera->tl());
-        geom::xy brxy = getMapTileXY(player->br() - camera->tl());
+        geom::xy tlxy = getMapTileXy(player->tl() - camera->tl());
+        geom::xy trxy = getMapTileXy(player->tr() - camera->tl());
+        geom::xy blxy = getMapTileXy(player->bl() - camera->tl());
+        geom::xy brxy = getMapTileXy(player->br() - camera->tl());
         
         SDL_Rect tlRect = SDL_Rect{
             (int)tlxy.x * TILESIZE,
@@ -366,18 +380,19 @@ void Game::render()
         
         // draw mouse indicator
         {
-            geom::xy start = getScreenXY(mouseIndicator.start);
-            lineRGBA(renderer,
-                     start.x, start.y,
-                     mouse.x, mouse.y,
-                     0x00, 0xff, 0x00, 0xff);
-            
-            rectangleRGBA(renderer,
-                          (int)mouseIndicator.end.x / TILESIZE * TILESIZE,
-                          (int)mouseIndicator.end.y / TILESIZE * TILESIZE,
-                          (int)mouseIndicator.end.x / TILESIZE * TILESIZE + TILESIZE,
-                          (int)mouseIndicator.end.y / TILESIZE * TILESIZE + TILESIZE,
-                          0xff, 0x00, 0xff, 0xff);
+            geom::xy start = getScreenXy(mouseIndicator.start);
+            SDL_RenderDrawLine(renderer, start.x, start.y, mouse.x, mouse.y);
+//            lineRGBA(renderer,
+//                     start.x, start.y,
+//                     mouse.x, mouse.y,
+//                     0x00, 0xff, 0x00, 0xff);
+
+//            rectangleRGBA(renderer,
+//                          (int)mouseIndicator.end.x / TILESIZE * TILESIZE,
+//                          (int)mouseIndicator.end.y / TILESIZE * TILESIZE,
+//                          (int)mouseIndicator.end.x / TILESIZE * TILESIZE + TILESIZE,
+//                          (int)mouseIndicator.end.y / TILESIZE * TILESIZE + TILESIZE,
+//                          0xff, 0x00, 0xff, 0xff);
             
         }
     }
@@ -498,7 +513,7 @@ void Game::handleEvents()
     }
 }
 
-geom::xy Game::getMapTileXY(geom::xy arg) {
+geom::xy Game::getMapTileXy(geom::xy arg) {
     return {
         (float)((int)arg.x / (int) TILESIZE),
         (float)((int)arg.y / (int) TILESIZE)
@@ -506,8 +521,12 @@ geom::xy Game::getMapTileXY(geom::xy arg) {
 }
 
 // TODO: update for camera z-position
-geom::xy Game::getScreenXY(geom::xy arg) {
-    return arg - camera->tl();
+geom::xy Game::getScreenXy(geom::xy gameXy) {
+    return gameXy - camera->tl();
+}
+
+geom::xy Game::getGameXy(geom::xy screenXy) {
+    return camera->tl() - screenXy;
 }
 
 int Game::getScreenX(int arg) {
@@ -519,7 +538,7 @@ int Game::getScreenY(int arg) {
 }
 
 int Game::getMapTileVal(geom::xy arg) {
-    arg = getMapTileXY(arg);
+    arg = getMapTileXy(arg);
     return maps[map][arg.y][arg.x];
 }
 
@@ -537,6 +556,8 @@ void Game::clean()
     delete player;
     delete camera;
     delete prevFrame;
+    for (Bullet* b : bullets)
+        delete b;
     
     SDL_DestroyWindow(window);
     SDL_DestroyRenderer(renderer);

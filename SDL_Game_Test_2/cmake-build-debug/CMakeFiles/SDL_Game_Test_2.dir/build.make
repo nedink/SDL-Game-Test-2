@@ -57,9 +57,33 @@ include CMakeFiles/SDL_Game_Test_2.dir/progress.make
 # Include the compile flags for this target's objects.
 include CMakeFiles/SDL_Game_Test_2.dir/flags.make
 
+CMakeFiles/SDL_Game_Test_2.dir/bullet.cpp.o: CMakeFiles/SDL_Game_Test_2.dir/flags.make
+CMakeFiles/SDL_Game_Test_2.dir/bullet.cpp.o: ../bullet.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir="/Users/david/Documents/Xcode Projects/SDL_Game_Test_2/SDL_Game_Test_2/cmake-build-debug/CMakeFiles" --progress-num=$(CMAKE_PROGRESS_1) "Building CXX object CMakeFiles/SDL_Game_Test_2.dir/bullet.cpp.o"
+	/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/SDL_Game_Test_2.dir/bullet.cpp.o -c "/Users/david/Documents/Xcode Projects/SDL_Game_Test_2/SDL_Game_Test_2/bullet.cpp"
+
+CMakeFiles/SDL_Game_Test_2.dir/bullet.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/SDL_Game_Test_2.dir/bullet.cpp.i"
+	/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E "/Users/david/Documents/Xcode Projects/SDL_Game_Test_2/SDL_Game_Test_2/bullet.cpp" > CMakeFiles/SDL_Game_Test_2.dir/bullet.cpp.i
+
+CMakeFiles/SDL_Game_Test_2.dir/bullet.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/SDL_Game_Test_2.dir/bullet.cpp.s"
+	/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S "/Users/david/Documents/Xcode Projects/SDL_Game_Test_2/SDL_Game_Test_2/bullet.cpp" -o CMakeFiles/SDL_Game_Test_2.dir/bullet.cpp.s
+
+CMakeFiles/SDL_Game_Test_2.dir/bullet.cpp.o.requires:
+
+.PHONY : CMakeFiles/SDL_Game_Test_2.dir/bullet.cpp.o.requires
+
+CMakeFiles/SDL_Game_Test_2.dir/bullet.cpp.o.provides: CMakeFiles/SDL_Game_Test_2.dir/bullet.cpp.o.requires
+	$(MAKE) -f CMakeFiles/SDL_Game_Test_2.dir/build.make CMakeFiles/SDL_Game_Test_2.dir/bullet.cpp.o.provides.build
+.PHONY : CMakeFiles/SDL_Game_Test_2.dir/bullet.cpp.o.provides
+
+CMakeFiles/SDL_Game_Test_2.dir/bullet.cpp.o.provides.build: CMakeFiles/SDL_Game_Test_2.dir/bullet.cpp.o
+
+
 CMakeFiles/SDL_Game_Test_2.dir/camera.cpp.o: CMakeFiles/SDL_Game_Test_2.dir/flags.make
 CMakeFiles/SDL_Game_Test_2.dir/camera.cpp.o: ../camera.cpp
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir="/Users/david/Documents/Xcode Projects/SDL_Game_Test_2/SDL_Game_Test_2/cmake-build-debug/CMakeFiles" --progress-num=$(CMAKE_PROGRESS_1) "Building CXX object CMakeFiles/SDL_Game_Test_2.dir/camera.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir="/Users/david/Documents/Xcode Projects/SDL_Game_Test_2/SDL_Game_Test_2/cmake-build-debug/CMakeFiles" --progress-num=$(CMAKE_PROGRESS_2) "Building CXX object CMakeFiles/SDL_Game_Test_2.dir/camera.cpp.o"
 	/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/SDL_Game_Test_2.dir/camera.cpp.o -c "/Users/david/Documents/Xcode Projects/SDL_Game_Test_2/SDL_Game_Test_2/camera.cpp"
 
 CMakeFiles/SDL_Game_Test_2.dir/camera.cpp.i: cmake_force
@@ -83,7 +107,7 @@ CMakeFiles/SDL_Game_Test_2.dir/camera.cpp.o.provides.build: CMakeFiles/SDL_Game_
 
 CMakeFiles/SDL_Game_Test_2.dir/Game.cpp.o: CMakeFiles/SDL_Game_Test_2.dir/flags.make
 CMakeFiles/SDL_Game_Test_2.dir/Game.cpp.o: ../Game.cpp
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir="/Users/david/Documents/Xcode Projects/SDL_Game_Test_2/SDL_Game_Test_2/cmake-build-debug/CMakeFiles" --progress-num=$(CMAKE_PROGRESS_2) "Building CXX object CMakeFiles/SDL_Game_Test_2.dir/Game.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir="/Users/david/Documents/Xcode Projects/SDL_Game_Test_2/SDL_Game_Test_2/cmake-build-debug/CMakeFiles" --progress-num=$(CMAKE_PROGRESS_3) "Building CXX object CMakeFiles/SDL_Game_Test_2.dir/Game.cpp.o"
 	/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/SDL_Game_Test_2.dir/Game.cpp.o -c "/Users/david/Documents/Xcode Projects/SDL_Game_Test_2/SDL_Game_Test_2/Game.cpp"
 
 CMakeFiles/SDL_Game_Test_2.dir/Game.cpp.i: cmake_force
@@ -107,7 +131,7 @@ CMakeFiles/SDL_Game_Test_2.dir/Game.cpp.o.provides.build: CMakeFiles/SDL_Game_Te
 
 CMakeFiles/SDL_Game_Test_2.dir/main.cpp.o: CMakeFiles/SDL_Game_Test_2.dir/flags.make
 CMakeFiles/SDL_Game_Test_2.dir/main.cpp.o: ../main.cpp
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir="/Users/david/Documents/Xcode Projects/SDL_Game_Test_2/SDL_Game_Test_2/cmake-build-debug/CMakeFiles" --progress-num=$(CMAKE_PROGRESS_3) "Building CXX object CMakeFiles/SDL_Game_Test_2.dir/main.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir="/Users/david/Documents/Xcode Projects/SDL_Game_Test_2/SDL_Game_Test_2/cmake-build-debug/CMakeFiles" --progress-num=$(CMAKE_PROGRESS_4) "Building CXX object CMakeFiles/SDL_Game_Test_2.dir/main.cpp.o"
 	/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/SDL_Game_Test_2.dir/main.cpp.o -c "/Users/david/Documents/Xcode Projects/SDL_Game_Test_2/SDL_Game_Test_2/main.cpp"
 
 CMakeFiles/SDL_Game_Test_2.dir/main.cpp.i: cmake_force
@@ -131,7 +155,7 @@ CMakeFiles/SDL_Game_Test_2.dir/main.cpp.o.provides.build: CMakeFiles/SDL_Game_Te
 
 CMakeFiles/SDL_Game_Test_2.dir/player.cpp.o: CMakeFiles/SDL_Game_Test_2.dir/flags.make
 CMakeFiles/SDL_Game_Test_2.dir/player.cpp.o: ../player.cpp
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir="/Users/david/Documents/Xcode Projects/SDL_Game_Test_2/SDL_Game_Test_2/cmake-build-debug/CMakeFiles" --progress-num=$(CMAKE_PROGRESS_4) "Building CXX object CMakeFiles/SDL_Game_Test_2.dir/player.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir="/Users/david/Documents/Xcode Projects/SDL_Game_Test_2/SDL_Game_Test_2/cmake-build-debug/CMakeFiles" --progress-num=$(CMAKE_PROGRESS_5) "Building CXX object CMakeFiles/SDL_Game_Test_2.dir/player.cpp.o"
 	/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/SDL_Game_Test_2.dir/player.cpp.o -c "/Users/david/Documents/Xcode Projects/SDL_Game_Test_2/SDL_Game_Test_2/player.cpp"
 
 CMakeFiles/SDL_Game_Test_2.dir/player.cpp.i: cmake_force
@@ -155,6 +179,7 @@ CMakeFiles/SDL_Game_Test_2.dir/player.cpp.o.provides.build: CMakeFiles/SDL_Game_
 
 # Object files for target SDL_Game_Test_2
 SDL_Game_Test_2_OBJECTS = \
+"CMakeFiles/SDL_Game_Test_2.dir/bullet.cpp.o" \
 "CMakeFiles/SDL_Game_Test_2.dir/camera.cpp.o" \
 "CMakeFiles/SDL_Game_Test_2.dir/Game.cpp.o" \
 "CMakeFiles/SDL_Game_Test_2.dir/main.cpp.o" \
@@ -163,13 +188,14 @@ SDL_Game_Test_2_OBJECTS = \
 # External object files for target SDL_Game_Test_2
 SDL_Game_Test_2_EXTERNAL_OBJECTS =
 
+SDL_Game_Test_2: CMakeFiles/SDL_Game_Test_2.dir/bullet.cpp.o
 SDL_Game_Test_2: CMakeFiles/SDL_Game_Test_2.dir/camera.cpp.o
 SDL_Game_Test_2: CMakeFiles/SDL_Game_Test_2.dir/Game.cpp.o
 SDL_Game_Test_2: CMakeFiles/SDL_Game_Test_2.dir/main.cpp.o
 SDL_Game_Test_2: CMakeFiles/SDL_Game_Test_2.dir/player.cpp.o
 SDL_Game_Test_2: CMakeFiles/SDL_Game_Test_2.dir/build.make
 SDL_Game_Test_2: CMakeFiles/SDL_Game_Test_2.dir/link.txt
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir="/Users/david/Documents/Xcode Projects/SDL_Game_Test_2/SDL_Game_Test_2/cmake-build-debug/CMakeFiles" --progress-num=$(CMAKE_PROGRESS_5) "Linking CXX executable SDL_Game_Test_2"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir="/Users/david/Documents/Xcode Projects/SDL_Game_Test_2/SDL_Game_Test_2/cmake-build-debug/CMakeFiles" --progress-num=$(CMAKE_PROGRESS_6) "Linking CXX executable SDL_Game_Test_2"
 	$(CMAKE_COMMAND) -E cmake_link_script CMakeFiles/SDL_Game_Test_2.dir/link.txt --verbose=$(VERBOSE)
 
 # Rule to build all files generated by this target.
@@ -177,6 +203,7 @@ CMakeFiles/SDL_Game_Test_2.dir/build: SDL_Game_Test_2
 
 .PHONY : CMakeFiles/SDL_Game_Test_2.dir/build
 
+CMakeFiles/SDL_Game_Test_2.dir/requires: CMakeFiles/SDL_Game_Test_2.dir/bullet.cpp.o.requires
 CMakeFiles/SDL_Game_Test_2.dir/requires: CMakeFiles/SDL_Game_Test_2.dir/camera.cpp.o.requires
 CMakeFiles/SDL_Game_Test_2.dir/requires: CMakeFiles/SDL_Game_Test_2.dir/Game.cpp.o.requires
 CMakeFiles/SDL_Game_Test_2.dir/requires: CMakeFiles/SDL_Game_Test_2.dir/main.cpp.o.requires

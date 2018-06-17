@@ -8,7 +8,7 @@
 
 #include "Game.h"
 #include <iostream>
-#include <stdio.h>
+#include <cstdio>
 #include <vector>
 #include <cstring>
 

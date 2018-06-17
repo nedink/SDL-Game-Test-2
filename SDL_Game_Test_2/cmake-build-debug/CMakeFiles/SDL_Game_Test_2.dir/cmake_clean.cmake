@@ -1,4 +1,5 @@
 file(REMOVE_RECURSE
+  "CMakeFiles/SDL_Game_Test_2.dir/bullet.cpp.o"
   "CMakeFiles/SDL_Game_Test_2.dir/camera.cpp.o"
   "CMakeFiles/SDL_Game_Test_2.dir/Game.cpp.o"
   "CMakeFiles/SDL_Game_Test_2.dir/main.cpp.o"

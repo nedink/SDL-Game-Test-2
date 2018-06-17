@@ -2,15 +2,15 @@
 #pragma once
 
 #include <SDL2/SDL.h>
-#include <SDL2_image/SDL_image.h>
-#include <SDL2_gfx/SDL2_gfxPrimitives.h>
+#include <SDL_image.h>
+//#include <SDL2_gfx/SDL2_gfxPrimitives.h>
 
 #include <stdio.h>
 #include <vector>
 #include <map>
 
 #include "values.h"
-#include "physics.h"
+#include "util/physics.h"
 
 #define DEGTORAD 0.0174532925199432957f
 #define RADTODEG 57.295779513082320876f
@@ -42,10 +42,11 @@ public:
     void render();
     void clean();
     
-    geom::xy getScreenXY(geom::xy xy);
+    geom::xy getScreenXy(geom::xy gameXy);
+    geom::xy getGameXy(geom::xy screenXy);
     int getScreenX(int arg);
     int getScreenY(int arg);
-    geom::xy getMapTileXY(geom::xy xy);
+    geom::xy getMapTileXy(geom::xy xy);
     int getMapTileVal(geom::xy xy);
     bool isGrounded(geom::aabb aabb);
     int groundedTile(geom::xy xy);
@@ -63,9 +64,9 @@ public:
     bool jumped = false;
     geom::xy mouse;
     geom::line mouseIndicator;
-    Player* player;
+    Player* player = nullptr;
     std::vector<Bullet*> bullets;
-    Camera* camera;
+    Camera* camera = nullptr;
     u_long ticks = 0;
     int reloadTicks = 0;
     

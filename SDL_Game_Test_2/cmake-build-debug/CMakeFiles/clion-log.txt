@@ -1,8 +1,5 @@
 /Applications/CLion.app/Contents/bin/cmake/bin/cmake -DCMAKE_BUILD_TYPE=Debug -G "CodeBlocks - Unix Makefiles" "/Users/david/Documents/Xcode Projects/SDL_Game_Test_2/SDL_Game_Test_2"
-CMake Error at CMakeLists.txt:16 (TARGET_LINK_LIBRARIES):
-  Cannot specify link libraries for target "SDL_Game_Test_2" which is not
-  built by this project.
-
-
--- Configuring incomplete, errors occurred!
-See also "/Users/david/Documents/Xcode Projects/SDL_Game_Test_2/SDL_Game_Test_2/cmake-build-debug/CMakeFiles/CMakeOutput.log".
+-- Found SDL2_gfx: /Library/Frameworks/SDL2_gfx.framework (found version "1.0.1") 
+-- Configuring done
+-- Generating done
+-- Build files have been written to: /Users/david/Documents/Xcode Projects/SDL_Game_Test_2/SDL_Game_Test_2/cmake-build-debug

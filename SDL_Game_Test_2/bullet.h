@@ -2,7 +2,7 @@
 #ifndef bullet_h
 #define bullet_h
 
-#include "physics.h"
+#include "util/physics.h"
 
 class Bullet : public phys::PhysObj {
 public:
